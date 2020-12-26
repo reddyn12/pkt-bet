@@ -10,6 +10,8 @@ import array
 import time
 import csv
 
+import const
+
 config={
     "apiKey": "AIzaSyBINwiPfBLNl59Bh4GNbPAWViNfn6UZrqo",
     "authDomain": "betinfo-15db0.firebaseapp.com",
@@ -43,6 +45,9 @@ live_game=games.find_all("div",class_="gamePod gamePod-type-game status-live")
 num_live_games=len(live_game)
 data=[["NCAA ID","New ID","Period","Time","Home Team","Home Score","Home FGM/A","Away Team","Away Score","Away FGM/A"]]
 
+
+key_list=list(const.comb)
+val_list=list(const.comb.values())
 
 
 #print(data)
@@ -155,26 +160,36 @@ for i in range(num_live_games):
 
 
     for x in range(len(livecnt) // 2):
-        print("AWAY:  "+team_names[x * 2].text.lower()+"  |  "+away_team.lower().replace("st.","state").strip())
-        print("HOME:   " + team_names[(x * 2) + 1].text.lower()+"  |  "+home_team.lower().replace("st.","state").strip())
-        data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                     "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score, "away_fgma": away_fgma, "away_ps_line": "N/A",
-                     "away_tp_line": "N/A", "home_ps_line": "N/A", "home_tp_line": "N/A"}
-        if(team_names[x * 2].text.lower()==away_team.lower().replace("st.","state").strip()):
-            data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                         "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score,
-                         "away_fgma": away_fgma, "away_ps_line": ps_lines[x * 2].text,
-                         "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
-                         "home_tp_line": tp_lines[(x * 2) + 1].text}
-            break
-        elif(team_names[(x * 2) + 1].text.lower()==home_team.lower().replace("st.","state").strip()):
-            data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                         "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score,
-                         "away_fgma": away_fgma, "away_ps_line": ps_lines[x * 2].text,
-                         "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
-                         "home_tp_line": tp_lines[(x * 2) + 1].text}
-            break
+        done=False
+        for z in range(len(key_list)):
+            naway=away_team.lower().replace(key_list[z],val_list[z]).strip()
+            nhome=home_team.lower().replace(key_list[z],val_list[z]).strip()
+            daway=team_names[x * 2].text.lower().strip()
+            dhome=team_names[(x * 2) + 1].text.lower().strip()
 
+            print("AWAY:  "+daway+"  |  "+naway)
+            print("HOME:   " + dhome+"  |  "+nhome)
+            data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                         "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score, "away_fgma": away_fgma, "away_ps_line": "N/A",
+                         "away_tp_line": "N/A", "home_ps_line": "N/A", "home_tp_line": "N/A"}
+            if(daway==naway):
+                data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                             "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score,
+                             "away_fgma": away_fgma, "away_ps_line": ps_lines[x * 2].text,
+                             "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
+                             "home_tp_line": tp_lines[(x * 2) + 1].text}
+                done=True
+                break
+            elif(dhome==nhome):
+                data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                             "home_fgma": home_fgma, "away_team": away_team, "away_score": away_score,
+                             "away_fgma": away_fgma, "away_ps_line": ps_lines[x * 2].text,
+                             "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
+                             "home_tp_line": tp_lines[(x * 2) + 1].text}
+                done=True
+                break
+        if done:
+            break
     driver1.close()
 
     '''
@@ -185,6 +200,7 @@ for i in range(num_live_games):
 
     db.child("combData").child(ncid).push(data_fire)
     #end scrappin code
+    driver.back()
     driver.back()
 
 

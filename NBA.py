@@ -30,9 +30,9 @@ key_list = list(const.comb)
 val_list = list(const.comb.values())
 
 driver = webdriver.Chrome("/Users/Nikhil/Downloads/chromedriver")
-driver.get('https://www.espn.com/mens-college-basketball/scoreboard')
+driver.get('https://www.espn.com/nba/scoreboard')
 driver1 = webdriver.Chrome("/Users/Nikhil/Downloads/chromedriver")
-driver1.get("https://sportsbook.draftkings.com/leagues/basketball/3230960?category=game-lines&subcategory=game")
+driver1.get("https://sportsbook.draftkings.com/leagues/basketball/103?category=game-lines&subcategory=game")
 
 # do the scrapping code
 page = driver.page_source
@@ -46,7 +46,7 @@ for i in live_games:
     live_id.append(i["id"])
 
 for i in live_id:
-    driver.get("https://www.espn.com/mens-college-basketball/boxscore?gameId=" + i)
+    driver.get("https://www.espn.com/nba/boxscore?gameId=" + i)
 
     page = driver.page_source
     soup = BeautifulSoup(page, 'html.parser')
@@ -84,6 +84,10 @@ for i in live_id:
     home_fgm=home_fgma[0]
     home_fga=home_fgma[1]
 
+    data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                 "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
+                 "away_fgm": away_fgm, "away_fga": away_fga, "away_ps_line": "N/A",
+                 "away_tp_line": "N/A", "home_ps_line": "N/A", "home_tp_line": "N/A"}
     # DK START
 
     team_names = driver1.find_elements_by_class_name("event-cell__name")
@@ -107,45 +111,41 @@ for i in live_id:
 
     done=False
     for x in range(len(livecnt) // 2):
-        for z in range(len(key_list)):
-            naway = away_team.lower().replace(key_list[z], val_list[z]).strip()
-            nhome = home_team.lower().replace(key_list[z], val_list[z]).strip()
-            daway = team_names[x * 2].text.lower().strip()
-            dhome = team_names[(x * 2) + 1].text.lower().strip()
 
-            print("AWAY:  " + daway + "  |  " + naway)
-            print("HOME:   " + dhome + "  |  " + nhome)
+        naway = away_team.lower().strip()
+        nhome = home_team.lower().strip()
+        daway = team_names[x * 2].text.lower()
+        dhome = team_names[(x * 2) + 1].text.lower()
+
+        print("AWAY:  " + daway + "  |  " + naway)
+        print("HOME:   " + dhome + "  |  " + nhome)
+        data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                     "home_fgm": home_fgm, "home_fga": home_fga,"away_team": away_team, "away_score": away_score,
+                     "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": "N/A",
+                     "away_tp_line": "N/A", "home_ps_line": "N/A", "home_tp_line": "N/A"}
+        if naway in daway:
             data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                         "home_fgm": home_fgm, "home_fga": home_fga,"away_team": away_team, "away_score": away_score,
-                         "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": "N/A",
-                         "away_tp_line": "N/A", "home_ps_line": "N/A", "home_tp_line": "N/A"}
-            if (daway == naway):
-                data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                             "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
-                             "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": ps_lines[x * 2].text,
-                             "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
-                             "home_tp_line": tp_lines[(x * 2) + 1].text}
-                done = True
-                break
-            elif (dhome == nhome):
-                data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
-                             "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
-                             "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": ps_lines[x * 2].text,
-                             "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
-                             "home_tp_line": tp_lines[(x * 2) + 1].text}
-                done = True
-                break
-        if done:
+                         "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
+                         "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": ps_lines[x * 2].text,
+                         "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
+                         "home_tp_line": tp_lines[(x * 2) + 1].text}
+            done = True
             break
+        elif nhome in dhome:
+            data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                         "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
+                         "away_fgm": away_fgm,"away_fga": away_fga, "away_ps_line": ps_lines[x * 2].text,
+                         "away_tp_line": tp_lines[x * 2].text, "home_ps_line": ps_lines[(x * 2) + 1].text,
+                         "home_tp_line": tp_lines[(x * 2) + 1].text}
+            done = True
+            break
+
 
     # DK END
 
-    if done:
-        modules.m1(data_fire["home_team"],data_fire["away_team"],data_fire["home_ps_line"],data_fire["away_ps_line"],
-                   data_fire["home_fgm"]/data_fire["home_fga"],data_fire["away_fgm"]/data_fire["away_fga"],
-                   data_fire["home_fga"],data_fire["away_fga"],data_fire["clock"],data_fire["period"])
 
-    db.child("ESPNcombData").child(i).push(data_fire)
+
+    db.child("NBAcombData").child(i).push(data_fire)
 
 driver.close()
 driver1.close()

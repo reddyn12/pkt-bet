@@ -12,3 +12,8 @@ def m1(ht,at,hs,ass,hp,ap,ha,aa,cl,per):
                 autoalert.text()
     print("hi")
 
+def lifes2short():
+    pass
+
+def lifs2long():
+    pass

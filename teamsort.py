@@ -36,12 +36,13 @@ for i in data:
 
 d1=OrderedDict()
 for i in sort.keys():
+    print(i)
     d1.update({i:sort.get(i)})
-save_data("stuff/test.csv", d1)
+save_data("stuff/ind.csv", d1)
 
 
 games={}
-tn="LA"
+tn="Brooklyn"
 for i in sort.get(tn):
     if i[0] not in games.keys():
         games.update({i[0]:[]})
@@ -58,15 +59,16 @@ for i in games.keys():
             if "." in j[16]:
                 y.append(float(j[16]))
                 x.append(modules.getTime(j[2], j[3]))
-
+                print(j[0]+": ("+str(modules.getTime(j[2], j[3]))+","+j[16])
+                print(j[2]+"     "+j[3])
         else:
             if "." in j[12]:
                 y.append(float(j[12]))
                 x.append(modules.getTime(j[2], j[3]))
+                print(j[0] + ": (" + str(modules.getTime(j[2], j[3])) + "," + j[12])
+                print(j[2] + "     " + j[3])
 
-
-
-    plt.plot(x,y,"o", label=i)
+    plt.plot(x,y, label=i)
 
 plt.legend()
 plt.show()

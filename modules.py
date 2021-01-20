@@ -1,3 +1,7 @@
+import csv
+
+from pyexcel_io import get_data
+
 import autoalert
 
 
@@ -17,6 +21,46 @@ def lifes2short():
 
 def lifs2long():
     pass
+def teamData(name):
+    data = get_data("stuff/ind.csv")
+    games={}
+    for i in data[name]:
+        if i[0] not in games.keys():
+            games.update({i[0]: []})
+        d = games.get(i[0])
+        d.append(i)
+        games.update({i[0]: d})
+    return games
+def teamData1(name):
+    datafile = open('output.csv', 'r')
+    datareader = csv.reader(datafile, delimiter=',')
+    data = []
+    for row in datareader:
+        data.append(row)
+    datafile.close()
+    data.pop(0)
+    sort = {}
+
+    for i in data:
+        if i[4] not in sort.keys():
+            sort.update({i[4]: []})
+        if i[8] not in sort.keys():
+            sort.update({i[8]: []})
+        h = sort.get(i[4])
+        a = sort.get(i[8])
+        h.append(i)
+        a.append(i)
+        sort.update({i[4]: h})
+        sort.update({i[8]: a})
+
+    games = {}
+    for i in sort.get(name):
+        if i[0] not in games.keys():
+            games.update({i[0]: []})
+        d = games.get(i[0])
+        d.append(i)
+        games.update({i[0]: d})
+    return games
 
 def minconv(t):
     m=float(t.split(":")[0])
@@ -52,13 +96,16 @@ def getTime(c,t):
                         perc=c.split(" - ")[1]
                         per=perc[0]
                         s=c.split(" - ")[0]
-                        x=s.split(".")[0]
-                        if len(x)==1:
-                            temp = "0:0"+x
+                        x=str(int(s.split(".")[0])+1)
+                        if "0.0"==s:
+                            time=str(int(per)+1)+".0"
                         else:
-                            temp="0:"+x
-                        time=per+"."
-                        time=time+minconv(temp)
+                            if len(x)==1:
+                                temp = "0:0"+x
+                            else:
+                                temp="0:"+x
+                            time=per+"."
+                            time=time+minconv(temp)
                     else:
                         per=int(c[-3])
                         per=per+1

@@ -1,4 +1,6 @@
 import pyrebase
+import csv
+
 
 config={
     "apiKey": "AIzaSyBINwiPfBLNl59Bh4GNbPAWViNfn6UZrqo",
@@ -10,12 +12,33 @@ config={
     "appId": "1:708518271456:web:1a340c9103367100397385",
     "measurementId": "G-5LMCF8X1GC"
 }
-
+"""
+data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
+                                 "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
+                                 "away_fgm": away_fgm, "away_fga": away_fga, "away_ps_line": apsl, "away_ps_odd": aplo,
+                                 "over_line": ototl, "over_odd": ototo, "home_ps_line": hpsl, "home_ps_odd": hplo,
+                                 "under_line": utotl,"under_odd": utoto, "away_ml_odd": amlo, "home_ml_odd": hmlo}
+"""
 firebase=pyrebase.initialize_app(config)
 
 db=firebase.database()
-test=db.shallow().get()
-for i in test:
-    print(i)
+test=db.child("timdataNBA").get()
+data=[["Game ID","INST ID","period","clock","home_team","home_score","home_fgm","home_fga","away_team","away_score"
+                        ,"away_fgm","away_fga","away_ps_line","away_ps_odd","over_line","over_odd","home_ps_line","home_ps_odd"
+                        ,"under_line","under_odd","away_ml_odd","home_ml_odd"]]
+for id in test.each():
+    gamedata=db.child("timdataNBA").child(id.key()).get()
+    for inst in gamedata.each():
+        d=inst.val()
+        data.append([id.key(),inst.key(),d["period"],d["clock"],d["home_team"],d["home_score"],d["home_fgm"],d["home_fga"],d["away_team"],d["away_score"]
+                        ,d["away_fgm"],d["away_fga"],d["away_ps_line"],d["away_ps_odd"],d["over_line"],d["over_odd"],d["home_ps_line"],d["home_ps_odd"]
+                        ,d["under_line"],d["under_odd"],d["away_ml_odd"],d["home_ml_odd"]])
+
+        #print(inst.val()["away_team"])
 
 
+with open('output.csv', mode='w') as output_file:
+    output = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    for i in data:
+        output.writerow(i)

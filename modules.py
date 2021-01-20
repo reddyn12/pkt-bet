@@ -17,3 +17,60 @@ def lifes2short():
 
 def lifs2long():
     pass
+
+def minconv(t):
+    m=float(t.split(":")[0])
+    s=float(t.split(":")[1])
+    comb=720-((m*60)+s)
+    sans=str(comb/720.0)
+    return sans.split(".")[1]
+
+def getTime(c,t):
+    try:
+        time="100"
+        if t=="0":
+            if "time" in c:
+                time="3.0"
+            else:
+                if "OT" in c:
+                    if "-" in c:
+
+                        s = c.split(" - ")[0]
+                        x = s.split(".")[0]
+                        if len(x) == 1:
+                            temp = "0:0" + x
+                        else:
+                            temp = "0:" + x
+
+                        time = "5."
+                        time = time + minconv(temp)
+                    else:
+
+                        time = "5.0"
+                else:
+                    if "-" in c:
+                        perc=c.split(" - ")[1]
+                        per=perc[0]
+                        s=c.split(" - ")[0]
+                        x=s.split(".")[0]
+                        if len(x)==1:
+                            temp = "0:0"+x
+                        else:
+                            temp="0:"+x
+                        time=per+"."
+                        time=time+minconv(temp)
+                    else:
+                        per=int(c[-3])
+                        per=per+1
+                        time=str(per)+".0"
+        else:
+            if "OT" in c:
+                time="5."
+                time=time+minconv(t)
+            else:
+                time=c[0]+"."
+                time=time+minconv(t)
+
+        return float(time)
+    except:
+        print("error  "+c+"  "+t)

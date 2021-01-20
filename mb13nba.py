@@ -4,13 +4,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pyrebase
 import selenium
-import autoalert
+
 from bs4 import BeautifulSoup
 import array
 import time
-import csv
-import const
-import modules
+
 
 config = {
     "apiKey": "AIzaSyBINwiPfBLNl59Bh4GNbPAWViNfn6UZrqo",
@@ -26,8 +24,7 @@ firebase = pyrebase.initialize_app(config)
 
 db = firebase.database()
 
-key_list = list(const.comb)
-val_list = list(const.comb.values())
+
 
 driver = webdriver.Chrome("/Users/Nikhil/Downloads/chromedriver")
 options = webdriver.ChromeOptions()
@@ -38,60 +35,67 @@ options.add_experimental_option('prefs', {
 driver1= webdriver.Chrome(path,options=options)
 
 while True:
-    done = False
-    driver.get('https://www.espn.com/nba/scoreboard')
-    driver1.get("https://sportsbook.fanduel.com/sports/navigation/830.1/10107.3")
-    # do the scrapping code
-    page = driver.page_source
-    soup = BeautifulSoup(page, 'html.parser')
-
-    # print(soup.div.attrs)
-    live_games = soup.findAll(class_="scoreboard basketball live js-show")
-    live_id = []
-    for i in live_games:
-        print(i["id"])
-        live_id.append(i["id"])
-
-    for i in live_id:
-        driver.get("https://www.espn.com/nba/boxscore?gameId=" + i)
-
+    try:
+        done = False
+        driver.get('https://www.espn.com/nba/scoreboard')
+        driver1.get("https://sportsbook.fanduel.com/sports/navigation/830.1/10107.3")
+        # do the scrapping code
         page = driver.page_source
         soup = BeautifulSoup(page, 'html.parser')
 
-        banner = soup.find(class_="competitors")
-        baway = banner.find(class_="team away")
-        bhome = banner.find(class_="team home")
-        binfo = banner.find(class_="game-status")
+        # print(soup.div.attrs)
+        live_games = soup.findAll(class_="scoreboard basketball live js-show")
+        live_id = []
+        for i in live_games:
+            print(i["id"])
+            live_id.append(i["id"])
 
-        per_info = binfo.find(class_="status-detail").text
-        if per_info == "Halftime":
-            clock = "0"
-            period = per_info
-        else:
-            arrper = per_info.split(" - ")
-            clock = arrper[0]
-            period = arrper[1]
-        away_team = baway.find(class_="long-name").text
-        home_team = bhome.find(class_="long-name").text
+        for i in live_id:
+            driver.get("https://www.espn.com/nba/boxscore?gameId=" + i)
 
-        away_score = baway.find(class_="score icon-font-after").text
-        home_score = bhome.find(class_="score icon-font-before").text
+            page = driver.page_source
+            soup = BeautifulSoup(page, 'html.parser')
 
-        away_info = soup.find(class_="col column-one gamepackage-away-wrap")
-        home_info = soup.find(class_="col column-two gamepackage-home-wrap")
+            banner = soup.find(class_="competitors")
+            baway = banner.find(class_="team away")
+            bhome = banner.find(class_="team home")
+            binfo = banner.find(class_="game-status")
 
-        away_totals = away_info.find(class_="totals highlight")
-        home_totals = home_info.find(class_="totals highlight")
+            per_info = binfo.find(class_="status-detail").text
+            if ":" in per_info:
+                arrper = per_info.split(" - ")
+                clock = arrper[0]
+                period = arrper[1]
+            else:
+                clock = "0"
+                period = per_info
+            away_team = baway.find(class_="long-name").text
+            home_team = bhome.find(class_="long-name").text
 
-        away_fgma = away_totals.find(class_="fg").text.split("-")
-        home_fgma = home_totals.find(class_="fg").text.split("-")
+            away_score = baway.find(class_="score icon-font-after").text
+            home_score = bhome.find(class_="score icon-font-before").text
 
-        away_fgm=away_fgma[0]
-        away_fga=away_fgma[1]
-        home_fgm=home_fgma[0]
-        home_fga=home_fgma[1]
-        min=int(clock.split(":")[0])
-        if(("1" in period and min<=3) or ("2" in period and min>=9)):
+            away_info = soup.find(class_="col column-one gamepackage-away-wrap")
+            home_info = soup.find(class_="col column-two gamepackage-home-wrap")
+
+            away_totals = away_info.find(class_="totals highlight")
+            home_totals = home_info.find(class_="totals highlight")
+
+            away_fgma = away_totals.find(class_="fg").text.split("-")
+            home_fgma = home_totals.find(class_="fg").text.split("-")
+
+            away_fgm=away_fgma[0]
+            away_fga=away_fgma[1]
+            home_fgm=home_fgma[0]
+            home_fga=home_fgma[1]
+            if clock=="0":
+                min=0
+            else:
+                if "." in clock:
+                    min=0
+                else:
+                    min=int(clock.split(":")[0])
+
             data_fire = {"period": period, "clock": clock, "home_team": home_team, "home_score": home_score,
                          "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
                          "away_fgm": away_fgm, "away_fga": away_fga, "away_ps_line": "N/A", "away_ps_odd": "N/A",
@@ -186,5 +190,6 @@ while True:
                 pass
 
             db.child("timdataNBA").child(i).push(data_fire)
-    time.sleep(30)
-
+        time.sleep(60)
+    except:
+        print("problem")

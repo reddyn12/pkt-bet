@@ -76,6 +76,8 @@ def getTime(c,t):
         if t=="0":
             if "time" in c:
                 time="3.0"
+            elif "Final" in c:
+                time="6.0"
             else:
                 if "OT" in c:
                     if "-" in c:
@@ -193,3 +195,21 @@ def retDataSeg(s,e,games):
                 inrange.update({j[0]: d})
                 ans.append(getTime(str(j[2]),str(j[3])))
     return inrange
+
+
+def psChecker(arg, row, agame):
+    if "home" in arg:
+        if agame[-1][9]-agame[-1][5]<=row[16]:
+            return True
+    elif "away" in arg:
+        if agame[-1][5] - agame[-1][9] <= row[12]:
+            return True
+    return False
+
+def isValidRow(r):
+    if "N/A" in r:
+        return False
+    elif "lock" in r:
+        return False
+    else:
+        return True

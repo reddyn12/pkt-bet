@@ -1,6 +1,7 @@
 import csv
 
 from pyexcel_io import get_data
+import matplotlib.pyplot as plt
 
 import autoalert
 
@@ -120,4 +121,75 @@ def getTime(c,t):
 
         return float(time)
     except:
-        print("error  "+c+"  "+t)
+        print("error timconv  "+c+"  "+t)
+
+
+def m2(row):
+    ans="err"
+    hsd=((row[5]-row[9])+row[16])*-1
+    asd=((row[9]-row[5])+row[12])*-1
+    hfgp=row[6]/row[7]
+    afgp=row[10]/row[11]
+    hfgpa=hfgp-afgp
+    afgpa=afgp-hfgp
+    hfga=row[7]-row[11]
+    afga=row[11]-row[7]
+
+    if hfgpa>0 and hfga>0 and hfgpa/hfga<0.06 and hsd<-2:
+        ans="home"
+    elif hfgpa<0 and hfga>0 and hfgpa/hfga>-0.07 and hsd<1.5:
+        ans="home"
+    elif hfgpa>0 and hfga<0 and hfgpa/hfga<-0.07 and hsd<-1.5:
+        ans="home"
+    elif hfgpa<0 and hfga<0 and hfgpa/hfga>0.06 and hsd<2:
+        ans="home"
+    elif afgpa>0 and afga>0 and afgpa/afga<0.06 and asd<-2:
+        ans="away"
+    elif afgpa<0 and afga>0 and afgpa/afga>-0.07 and asd<1.5:
+        ans="away"
+    elif afgpa>0 and afga<0 and afgpa/afga<-0.07 and asd<-1.5:
+        ans="away"
+    elif afgpa<0 and afga<0 and afgpa/afga>0.06 and asd<2:
+        ans="away"
+    return ans
+
+def pltps(name):
+    games = teamData1(name)
+
+    for i in games.keys():
+        game = games.get(i)
+        x = []
+        y = []
+        for j in game:
+
+            if j[4] == name:
+                if "." in j[16]:
+                    y.append(float(j[16]))
+                    x.append(getTime(j[2], j[3]))
+                    # print(j[0]+": ("+str(modules.getTime(j[2], j[3]))+","+j[16])
+                    # print(j[2]+"     "+j[3])
+            else:
+                if "." in j[12]:
+                    y.append(float(j[12]))
+                    x.append(getTime(j[2], j[3]))
+                    # print(j[0] + ": (" + str(modules.getTime(j[2], j[3])) + "," + j[12])
+                    # print(j[2] + "     " + j[3])
+
+        plt.plot(x, y, label=i)
+
+    plt.legend()
+    plt.show()
+def retDataSeg(s,e,games):
+    inrange={}
+    ans=[]
+    for i in games.keys():
+        game = games.get(i)
+        for j in game:
+            if getTime(str(j[2]),str(j[3]))>=s and getTime(str(j[2]),str(j[3]))<=e :
+                if j[0] not in inrange.keys():
+                    inrange.update({j[0]: []})
+                d = inrange.get(j[0])
+                d.append(j)
+                inrange.update({j[0]: d})
+                ans.append(getTime(str(j[2]),str(j[3])))
+    return inrange

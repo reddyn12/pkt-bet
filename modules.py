@@ -4,7 +4,7 @@ from collections import OrderedDict
 from pyexcel_io import get_data, save_data
 import matplotlib.pyplot as plt
 import pyrebase
-
+import time
 import autoalert
 import const
 
@@ -26,7 +26,10 @@ def lifes2short():
 def lifs2long():
     pass
 
-
+def UPTALL():
+    outputUPT()
+    gameDataUPT()
+    teamDataUPT()
 def outputUPT():
     config = {
         "apiKey": "AIzaSyBINwiPfBLNl59Bh4GNbPAWViNfn6UZrqo",
@@ -95,6 +98,32 @@ def gameData():
             d.append(i)
             games.update({i[0]: d})
     return games
+def teamDataUPT():
+    datafile = open('output.csv', 'r')
+    datareader = csv.reader(datafile, delimiter=',')
+    data = []
+    for row in datareader:
+        data.append(row)
+    datafile.close()
+    data.pop(0)
+    sort = {}
+
+    for i in data:
+        if i[4] not in sort.keys():
+            sort.update({i[4]: []})
+        if i[8] not in sort.keys():
+            sort.update({i[8]: []})
+        h = sort.get(i[4])
+        a = sort.get(i[8])
+        h.append(i)
+        a.append(i)
+        sort.update({i[4]: h})
+        sort.update({i[8]: a})
+
+    d1 = OrderedDict()
+    for i in sort.keys():
+        d1.update({i: sort.get(i)})
+    save_data("stuff/ind.csv", d1)
 def teamData(name):
     data = get_data("stuff/ind.csv")
     print(type(data))
@@ -288,3 +317,13 @@ def isValidRow(r):
         return False
     else:
         return True
+
+class Tme():
+    def __init__(self):
+        self.start = time.time()
+        self.end = None
+    def stop(self):
+        self.end = time.time()
+        print(self.end - self.start)
+    def time(self):
+        print(self.end-self.start)

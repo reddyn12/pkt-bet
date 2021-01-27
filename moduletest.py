@@ -28,6 +28,6 @@ for i in games.keys():
                         temp=test.get(j[0])
                         temp=temp+1
                         test.update({j[0]:temp})
-                        print(str(j[0]))
+
 print(str(g)+"/"+str(a))
 print(len(test.keys()))

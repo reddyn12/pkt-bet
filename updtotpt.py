@@ -1,6 +1,9 @@
 import pyrebase
 import csv
 
+import modules
+
+tme= modules.Tme()
 
 config={
     "apiKey": "AIzaSyBINwiPfBLNl59Bh4GNbPAWViNfn6UZrqo",
@@ -34,3 +37,4 @@ with open('output.csv', mode='w') as output_file:
 
     for i in data:
         output.writerow(i)
+tme.stop()

@@ -12,7 +12,7 @@ data.update({"Sheet 2": [["row 1", "row 2", "row 3"]]})
 save_data("stuff/test.csv", data)
 '''
 
-
+tme= modules.Tme()
 datafile = open('output.csv', 'r')
 datareader = csv.reader(datafile, delimiter=',')
 data = []
@@ -38,7 +38,7 @@ d1=OrderedDict()
 for i in sort.keys():
     d1.update({i:sort.get(i)})
 save_data("stuff/ind.csv", d1)
-
+tme.stop()
 
 
 

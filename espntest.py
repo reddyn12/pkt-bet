@@ -27,47 +27,6 @@ config = {
 firebase = pyrebase.initialize_app(config)
 
 db = firebase.database()
+test=db.child("timdataNBA").child("401267269").get()
 
-driver = webdriver.Chrome("/Users/Nikhil/Downloads/chromedriver")
-driver.get('https://www.espn.com/nba/boxscore?gameId=401267380')
-
-
-# do the scrapping code
-page = driver.page_source
-soup = BeautifulSoup(page, 'html.parser')
-
-banner=soup.find(class_="competitors sm-score")
-baway=banner.find(class_="team away")
-bhome=banner.find(class_="team home")
-binfo=banner.find(class_="game-status")
-
-
-
-away_team=baway.find(class_="long-name").text
-home_team=bhome.find(class_="long-name").text
-
-away_score=baway.find(class_="score icon-font-after").text
-home_score=bhome.find(class_="score icon-font-before").text
-
-away_info=soup.find(class_="col column-one gamepackage-away-wrap")
-home_info=soup.find(class_="col column-two gamepackage-home-wrap")
-
-away_totals=away_info.findAll(class_="highlight")[0]
-home_totals=home_info.findAll(class_="highlight")[0]
-
-away_fgma=away_totals.find(class_="fg").text
-home_fgma=home_totals.find(class_="fg").text
-
-away_fgm=away_fgma[0]
-away_fga=away_fgma[1]
-home_fgm=home_fgma[0]
-home_fga=home_fgma[1]
-
-data_fire = {"period": "Final", "clock": "0", "home_team": home_team, "home_score": home_score,
-                         "home_fgm": home_fgm, "home_fga": home_fga, "away_team": away_team, "away_score": away_score,
-                         "away_fgm": away_fgm, "away_fga": away_fga, "away_ps_line": "N/A", "away_ps_odd": "N/A",
-                         "over_line": "N/A", "over_odd": "N/A", "home_ps_line": "N/A", "home_ps_odd": "N/A",
-                         "under_line": "N/A",
-                         "under_odd": "N/A", "away_ml_odd": "N/A", "home_ml_odd": "N/A"}
-print(data_fire)
-driver.close()
+print(test.each()[-1].val()["period"])

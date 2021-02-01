@@ -327,3 +327,17 @@ class Tme():
         print(self.end - self.start)
     def time(self):
         print(self.end-self.start)
+
+def readCSV(url):
+    datafile = open(url, 'r')
+    datareader = csv.reader(datafile, delimiter=',')
+    data_old = []
+    for row in datareader:
+        data_old.append(row)
+    datafile.close()
+    return data_old
+def writeCSV(url, data):
+    with open(url, mode='w') as output_file:
+        output = csv.writer(output_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for i in data:
+            output.writerow(i)
